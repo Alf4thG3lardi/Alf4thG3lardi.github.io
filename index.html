@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Portfolio - Desktop First</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+    /* ensure anchors don't hide under fixed navbar */
+    section { scroll-margin-top: 88px; }
+    /* larger desktop container spacing */
+    @media (min-width: 1280px) {
+      .container-desktop { max-width: 1200px; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+  <!-- Navbar -->
+  <nav class="fixed w-full bg-white/80 backdrop-blur border-b border-gray-200 z-50">
+    <div class="container mx-auto container-desktop px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white font-bold">YP</div>
+        <div>
+          <h1 class="text-lg font-semibold">Your Portfolio</h1>
+          <div class="text-xs text-gray-500">Desktop-first responsive layout</div>
+        </div>
+      </div>
+
+      <div class="hidden lg:flex items-center gap-8 text-sm">
+        <a href="#home" class="hover:text-blue-600">Home</a>
+        <a href="#about" class="hover:text-blue-600">About</a>
+        <a href="#skills" class="hover:text-blue-600">Skills</a>
+        <a href="#projects" class="hover:text-blue-600">Projects</a>
+        <a href="#contact" class="hover:text-blue-600">Contact</a>
+      </div>
+
+      <!-- mobile menu button (kept for completeness) -->
+      <div class="lg:hidden">
+        <button aria-label="open menu" class="p-2 rounded-md border">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5h14a1 1 0 010 2H3a1 1 0 010-2zm0 4h14a1 1 0 010 2H3a1 1 0 010-2zm0 4h14a1 1 0 010 2H3a1 1 0 010-2z" clip-rule="evenodd" /></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO (desktop two-column) -->
+  <section id="home" class="min-h-[74vh] flex items-center pt-28">
+    <div class="container mx-auto container-desktop px-6 grid lg:grid-cols-12 gap-12 items-center">
+      <!-- Left: Intro text (spans 7 columns on large screens) -->
+      <div class="lg:col-span-7">
+        <h2 class="text-4xl lg:text-5xl font-bold mb-4">Hi, I'm <span class="text-blue-600">Your Name</span></h2>
+        <p class="text-lg text-gray-700 mb-6">Embedded Engineer • Full‑Stack Developer • IoT Enthusiast</p>
+
+        <p class="text-gray-600 mb-6 leading-relaxed max-w-2xl">
+          I design and build reliable embedded systems and intuitive web apps. I enjoy turning hardware signals into meaningful software features and shipping production-ready solutions.
+        </p>
+
+        <div class="flex items-center gap-4">
+          <a href="#projects" class="inline-block bg-blue-600 text-white px-5 py-3 rounded-lg shadow">See projects</a>
+          <a href="#contact" class="inline-block border border-gray-300 px-5 py-3 rounded-lg">Contact me</a>
+        </div>
+
+        <div class="mt-8 grid grid-cols-3 gap-4 max-w-lg">
+          <div class="p-4 bg-white border rounded-lg text-center">
+            <div class="text-2xl font-semibold">12+</div>
+            <div class="text-xs text-gray-500">Projects</div>
+          </div>
+          <div class="p-4 bg-white border rounded-lg text-center">
+            <div class="text-2xl font-semibold">2k+</div>
+            <div class="text-xs text-gray-500">Hours Coding</div>
+          </div>
+          <div class="p-4 bg-white border rounded-lg text-center">
+            <div class="text-2xl font-semibold">3</div>
+            <div class="text-xs text-gray-500">Internships</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Profile card (spans 5 columns on large screens) -->
+      <div class="lg:col-span-5">
+        <div class="bg-white shadow-lg rounded-2xl overflow-hidden border">
+          <div class="p-8 flex flex-col lg:flex-row items-center gap-6">
+            <img src="https://via.placeholder.com/260" alt="Profile" class="w-48 h-48 lg:w-40 lg:h-40 object-cover rounded-xl border">
+            <div class="flex-1">
+              <h3 class="text-xl font-semibold">Your Name</h3>
+              <p class="text-sm text-gray-500 mb-4">Embedded Systems & Web Developer</p>
+              <p class="text-sm text-gray-600 leading-relaxed">I build firmware for ESP32/STM32 and web backends with FastAPI / Node. Passionate about control systems and automation.</p>
+              <div class="mt-4 flex gap-3">
+                <a href="#contact" class="text-sm px-3 py-2 border rounded">Email</a>
+                <a href="#projects" class="text-sm px-3 py-2 border rounded">Portfolio</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 p-4 border-t flex justify-between text-sm">
+            <div><span class="font-semibold">Location:</span> Indonesia</div>
+            <div><span class="font-semibold">Experience:</span> Student / Intern</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="py-16 bg-white">
+    <div class="container mx-auto container-desktop px-6 grid lg:grid-cols-3 gap-10 items-start">
+      <div class="lg:col-span-2">
+        <h3 class="text-2xl font-bold mb-4">About Me</h3>
+        <p class="text-gray-700 leading-relaxed mb-6 max-w-3xl">
+          I'm focused on creating robust embedded firmware and clean user interfaces. I like to move between low-level device constraints and high-level product thinking. My toolset includes C/C++ for firmware, Python for tooling and backends, and React for frontend work.
+        </p>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-gray-50 p-4 border rounded">
+            <div class="text-sm text-gray-500">Name</div>
+            <div class="font-medium">Your Name</div>
+          </div>
+          <div class="bg-gray-50 p-4 border rounded">
+            <div class="text-sm text-gray-500">Email</div>
+            <div class="font-medium">youremail@example.com</div>
+          </div>
+          <div class="bg-gray-50 p-4 border rounded">
+            <div class="text-sm text-gray-500">Phone</div>
+            <div class="font-medium">+62 8xx xxx xxxx</div>
+          </div>
+          <div class="bg-gray-50 p-4 border rounded">
+            <div class="text-sm text-gray-500">Location</div>
+            <div class="font-medium">Jakarta, Indonesia</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-1">
+        <h4 class="text-lg font-semibold mb-4">Quick facts</h4>
+        <ul class="space-y-3 text-gray-600">
+          <li>• Comfortable with embedded C, FreeRTOS, and ESP32</li>
+          <li>• REST APIs with FastAPI / Express</li>
+          <li>• MQTT and real-time systems</li>
+          <li>• Data visualization & dashboards</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" class="py-16">
+    <div class="container mx-auto container-desktop px-6">
+      <h3 class="text-2xl font-bold mb-8">Skills</h3>
+
+      <div class="grid grid-cols-3 gap-6 lg:grid-cols-6">
+        <div class="p-4 bg-white border rounded">C / C++</div>
+        <div class="p-4 bg-white border rounded">Python</div>
+        <div class="p-4 bg-white border rounded">Java / Kotlin</div>
+        <div class="p-4 bg-white border rounded">React</div>
+        <div class="p-4 bg-white border rounded">FastAPI / Node</div>
+        <div class="p-4 bg-white border rounded">ESP32 / Arduino</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS (desktop grid fixed) -->
+  <section id="projects" class="py-16 bg-white">
+    <div class="container mx-auto container-desktop px-6">
+      <h3 class="text-2xl font-bold mb-8">Selected Projects</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- project card -->
+        <article class="bg-white border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
+          <img src="https://via.placeholder.com/800x450" alt="Project 1" class="w-full h-44 object-cover">
+          <div class="p-4">
+            <h4 class="font-semibold mb-2">Project 1 — IoT Monitoring</h4>
+            <p class="text-sm text-gray-600 mb-3">ESP32 based sensor network that reports to MQTT broker and dashboard.</p>
+            <a href="#" class="text-sm text-blue-600">View details →</a>
+          </div>
+        </article>
+
+        <article class="bg-white border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
+          <img src="https://via.placeholder.com/800x450" alt="Project 2" class="w-full h-44 object-cover">
+          <div class="p-4">
+            <h4 class="font-semibold mb-2">Project 2 — Dashboard</h4>
+            <p class="text-sm text-gray-600 mb-3">Web dashboard to visualize sensor data with real-time updates.</p>
+            <a href="#" class="text-sm text-blue-600">View details →</a>
+          </div>
+        </article>
+
+        <article class="bg-white border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
+          <img src="https://via.placeholder.com/800x450" alt="Project 3" class="w-full h-44 object-cover">
+          <div class="p-4">
+            <h4 class="font-semibold mb-2">Project 3 — Automation</h4>
+            <p class="text-sm text-gray-600 mb-3">Embedded controller for servo-actuated mechanism with control loop.</p>
+            <a href="#" class="text-sm text-blue-600">View details →</a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="py-16 bg-gray-50">
+    <div class="container mx-auto container-desktop px-6 max-w-2xl">
+      <h3 class="text-2xl font-bold mb-4">Contact</h3>
+      <p class="text-gray-700 mb-6">Want to work together? Send a message and I'll get back to you.</p>
+
+      <form class="space-y-4 bg-white p-6 border rounded-lg">
+        <div class="grid grid-cols-2 gap-4">
+          <input type="text" placeholder="Your name" class="p-3 border rounded" />
+          <input type="email" placeholder="Your email" class="p-3 border rounded" />
+        </div>
+        <textarea rows="6" placeholder="Message" class="w-full p-3 border rounded"></textarea>
+        <div class="flex justify-end">
+          <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded">Send message</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t py-6">
+    <div class="container mx-auto container-desktop px-6 text-sm text-gray-600 flex justify-between items-center">
+      <div>© 2025 Your Name</div>
+      <div class="space-x-4">
+        <a href="#" class="hover:text-blue-600">GitHub</a>
+        <a href="#" class="hover:text-blue-600">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
