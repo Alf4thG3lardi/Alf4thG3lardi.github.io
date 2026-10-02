@@ -1,277 +1,277 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>My Page - Desktop First</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            navy: '#0f172a',
-            navysoft: '#1e293b',
-            navylight: '#334155'
-          }
-        }
-      }
-    }
-  </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
-    section { scroll-margin-top: 88px; }
-    @media (min-width: 1280px) {
-      .container-desktop { max-width: 1200px; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GPS speed logger</title>
+<style>
+:root{--bg:#e9ede6;--panel:#f7f8f4;--ink:#17231e;--mute:#5d6b64;--line:#c9d1c7;--acc:#0b6e6e;--rec:#b93815}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Bahnschrift","DIN Alternate","Segoe UI",system-ui,sans-serif}
+main{max-width:560px;margin:0 auto;padding:16px 16px 40px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{font-size:1.1rem;margin:0;font-weight:600}
+.pill{padding:4px 12px;border-radius:99px;background:var(--panel);border:1px solid var(--line);font-size:.85rem}
+.pill.on{background:var(--rec);border-color:var(--rec);color:#fff}
+.speed{margin:14px 0 6px;padding:18px 16px 12px;background:var(--panel);border:1px solid var(--line);border-radius:6px;display:flex;align-items:baseline;justify-content:space-between}
+#spd{font-size:5.5rem;font-weight:600;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+#unit{font:inherit;font-size:1.2rem;padding:6px 12px;border:1px solid var(--ink);background:none;color:var(--ink);border-radius:4px}
+canvas{display:block;width:100%;height:90px;background:var(--panel);border:1px solid var(--line);border-radius:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:10px 0;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.stats div{background:var(--panel);padding:10px}
+.stats dt{font-size:.78rem;color:var(--mute)}
+.stats dd{margin:2px 0 0;font-size:1.15rem;font-weight:600;font-variant-numeric:tabular-nums}
+.pos{font-size:.9rem;color:var(--mute);font-variant-numeric:tabular-nums;margin:0 0 12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.row.one{grid-template-columns:2fr 1fr}
+button{font:inherit;padding:13px 10px;border-radius:6px;border:1px solid var(--ink);background:var(--panel);color:var(--ink);cursor:pointer}
+button.primary{background:var(--ink);color:#fff}
+button.primary.on{background:var(--rec);border-color:var(--rec)}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+#msg{min-height:1.4em;margin:6px 0;color:var(--rec);font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:500}
+.wrap{overflow-x:auto}
+</style>
 </head>
-<body class="bg-slate-100 text-slate-900">
+<body>
+<main>
+  <header><h1>GPS speed logger</h1><span id="status" class="pill">Idle</span></header>
 
-  <!-- Navbar -->
-    <nav class="fixed w-full bg-navy/90 backdrop-blur border-b border-navysoft z-50 text-white">
-        <div class="container mx-auto container-desktop px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-white text-navy rounded flex items-center justify-center font-bold">YP</div>
-                    <div>
-                        <h1 class="text-lg font-semibold">My Page</h1>
-                    <div class="text-xs text-gray-300">Desktop-first responsive layout</div>
-                </div>
-            </div>
+  <section class="speed"><div id="spd">0.0</div><button id="unit" title="Change unit">km/h</button></section>
+  <canvas id="chart"></canvas>
 
+  <dl class="stats">
+    <div><dt>Distance</dt><dd id="dist">0.00 km</dd></div>
+    <div><dt>Duration</dt><dd id="dur">00:00:00</dd></div>
+    <div><dt>Points</dt><dd id="cnt">0</dd></div>
+    <div><dt>Max speed</dt><dd id="max">0.0</dd></div>
+    <div><dt>Avg speed</dt><dd id="avg">0.0</dd></div>
+    <div><dt>Accuracy</dt><dd id="acc">–</dd></div>
+  </dl>
+  <p class="pos" id="pos">No position yet</p>
 
-            <div class="hidden lg:flex items-center gap-8 text-sm">
-                <a href="#home" class="hover:text-sky-300">Home</a>
-                <a href="#about" class="hover:text-sky-300">About</a>
-                <a href="#skills" class="hover:text-sky-300">Skills</a>
-                <a href="#projects" class="hover:text-sky-300">Projects</a>
-                <a href="#contact" class="hover:text-sky-300">Contact</a>
-            </div>
+  <div class="row one">
+    <button id="start" class="primary">Start recording</button>
+    <button id="clear">Clear</button>
+  </div>
+  <div class="row">
+    <button id="xml">Export XML</button>
+    <button id="xlsx">Export Excel</button>
+  </div>
+  <p id="msg" role="status"></p>
 
+  <div class="wrap">
+    <table>
+      <thead><tr><th>Time</th><th>Latitude</th><th>Longitude</th><th id="th-s">Speed</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</main>
 
-            <div class="lg:hidden">
-                <button id="menuBtn" aria-label="open menu" class="p-2 rounded-md border border-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5h14a1 1 0 010 2H3a1 1 0 010-2zm0 4h14a1 1 0 010 2H3a1 1 0 010-2zm0 4h14a1 1 0 010 2H3a1 1 0 010-2z" clip-rule="evenodd" /></svg>
-                </button>
-            </div>
-        </div>
-        <!-- Mobile Dropdown Menu -->
-        <div id="mobileMenu" class="lg:hidden hidden bg-navy border-t border-navysoft text-white">
-            <div class="flex flex-col px-6 py-4 space-y-3 text-sm">
-                <a href="#home" class="hover:text-sky-300">Home</a>
-                <a href="#about" class="hover:text-sky-300">About</a>
-                <a href="#skills" class="hover:text-sky-300">Skills</a>
-                <a href="#projects" class="hover:text-sky-300">Projects</a>
-                <a href="#contact" class="hover:text-sky-300">Contact</a>
-            </div>
-        </div>
-    </nav>
+<script>
+const $ = id => document.getElementById(id);
+const KEY = 'gpslog:v1';
+const U = [['km/h', 3.6], ['m/s', 1], ['mph', 2.23694]];
+let pts = [], start = null, watch = null, wl = null, unitI = 0, dist = 0, max = 0, fixed = false;
 
-  <!-- HERO -->
-  <section id="home" class="min-h-[74vh] flex items-center pt-28">
-    <div class="container mx-auto container-desktop px-6 grid lg:grid-cols-12 gap-12 items-center">
-      <div class="lg:col-span-7">
-        <h2 class="text-4xl lg:text-5xl font-bold mb-4">Hi, I'm <span class="text-navy">Alfath</span></h2>
-        <p class="text-lg text-slate-700 mb-6">Mechatronics Engineer • Full‑Stack Developer • Tech Enthusiast</p>
+/* ---------- storage ---------- */
+function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && Array.isArray(s.points)) { pts = s.points; start = s.start; }
+  } catch (e) {}
+  dist = pts.length ? pts[pts.length - 1].dist : 0;
+  max = pts.reduce((m, p) => Math.max(m, p.spd || 0), 0);
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify({ start, points: pts })); }
+  catch (e) { msg('Browser storage is full. Export your data, then clear.'); }
+}
+function msg(t) { $('msg').textContent = t || ''; }
 
-        <p class="text-slate-600 mb-6 leading-relaxed max-w-2xl">
-          I design and build reliable embedded systems and intuitive web apps. I enjoy turning hardware signals into meaningful software features and shipping production-ready solutions.
-        </p>
+/* ---------- geo ---------- */
+function hav(a, b, c, d) {
+  const R = 6371000, r = Math.PI / 180, x = (c - a) * r, y = (d - b) * r;
+  const h = Math.sin(x / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin(y / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+const rd = (v, n) => (v == null || isNaN(v)) ? null : +v.toFixed(n);
 
-        <div class="flex items-center gap-4">
-          <a href="#projects" class="inline-block bg-navy text-white px-5 py-3 rounded-lg shadow hover:bg-navysoft">See projects</a>
-          <a href="#contact" class="inline-block border border-navy px-5 py-3 rounded-lg text-navy">Contact me</a>
-        </div>
+function onPos(p) {
+  const c = p.coords, prev = pts[pts.length - 1];
+  let d = 0, spd = c.speed;
+  if (prev) d = hav(prev.lat, prev.lon, c.latitude, c.longitude);
+  if (spd == null || isNaN(spd)) {            // device gave no speed: derive it from movement
+    const dt = prev ? (p.timestamp - prev.t) / 1000 : 0;
+    spd = (dt > 0 && d >= 1.5) ? d / dt : 0;
+  }
+  const good = c.accuracy <= 50;
+  if (prev && good && d >= 1.5) dist += d;    // ignore GPS jitter and poor fixes
+  if (good) max = Math.max(max, spd);
+  fixed = true;
+  pts.push({ t: p.timestamp, lat: rd(c.latitude, 7), lon: rd(c.longitude, 7), alt: rd(c.altitude, 1),
+             acc: rd(c.accuracy, 1), spd: rd(spd, 3), hd: rd(c.heading, 1), dist: rd(dist, 1) });
+  if (pts.length % 10 === 0) save();
+  setStatus(); render();
+}
+function onErr(e) {
+  const m = { 1: 'Location permission denied. Allow location access for this page.',
+              2: 'Position unavailable. Check that GPS is on.', 3: 'GPS timed out. Move to open sky.' };
+  msg(m[e.code] || e.message);
+}
 
-        <div class="mt-8 grid grid-cols-2 gap-4 max-w-lg">
-          <div class="p-4 bg-white border border-navysoft rounded-lg text-center">
-            <div class="text-2xl font-semibold">5k+</div>
-            <div class="text-xs text-gray-500">Hours Coding</div>
-          </div>
-          <div class="p-4 bg-white border border-navysoft rounded-lg text-center">
-            <div class="text-2xl font-semibold">2</div>
-            <div class="text-xs text-gray-500">Internships</div>
-          </div>
-        </div>
-      </div>
+/* ---------- controls ---------- */
+async function lock() { try { wl = await navigator.wakeLock.request('screen'); } catch (e) {} }
+document.addEventListener('visibilitychange', () => { if (watch != null && document.visibilityState === 'visible') lock(); });
 
-      <div class="lg:col-span-5">
-        <div class="bg-white shadow-lg rounded-2xl overflow-hidden border border-navysoft">
-          <div class="p-8 flex flex-col lg:flex-row items-center gap-6">
-            <img src="https://via.placeholder.com/260" alt="Profile" class="w-48 h-48 lg:w-40 lg:h-40 object-cover rounded-xl border border-navysoft">
-            <div class="flex-1">
-              <h3 class="text-xl font-semibold">Muhammad Alfath Gelardi</h3>
-              <p class="text-sm text-gray-500 mb-4">Embedded Systems & Full Stack Web Developer</p>
-              <p class="text-sm text-gray-600 leading-relaxed">I build firmware for Arduino/ESP32/STM32 and web backends mainly using FastAPI / Node. Passionate about control systems and robotics.</p>
-              <div class="mt-4 flex gap-3">
-                <a href="#contact" class="text-sm px-3 py-2 border border-navy rounded text-navy">Email</a>
-                <a href="#projects" class="text-sm px-3 py-2 border border-navy rounded text-navy">Portfolio</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-gray-50 p-4 border-t border-navysoft flex justify-between text-sm">
-            <div><span class="font-semibold">Location:</span> Indonesia</div>
-            <div><span class="font-semibold">Experience:</span> Student / Intern</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ABOUT -->
-  <section id="about" class="py-16 bg-white">
-    <div class="container mx-auto container-desktop px-6 grid lg:grid-cols-3 gap-10 items-start">
-      <div class="lg:col-span-2">
-        <h3 class="text-2xl font-bold mb-4 text-navy">About Me</h3>
-        <p class="text-gray-700 leading-relaxed mb-6 max-w-3xl">
-          I'm focused on creating robust embedded firmware and clean user interfaces. I like to move between low-level device constraints and high-level product thinking. My toolset includes C/C++ for firmware, Python for tooling and backends, and React for frontend work.
-        </p>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-slate-50 p-4 border border-navysoft rounded">Name: Muhammad Alfath Gelardi</div>
-          <div class="bg-slate-50 p-4 border border-navysoft rounded overflow-x-auto">Email: alfathgelardiofficial@gmail.com</div>
-          <div class="bg-slate-50 p-4 border border-navysoft rounded">Phone: +62 895 1221 9988</div>
-          <div class="bg-slate-50 p-4 border border-navysoft rounded">Location: Sidoarjo, Indonesia</div>
-        </div>
-      </div>
-
-      <div class="lg:col-span-1">
-        <h4 class="text-lg font-semibold mb-4 text-navy">Quick facts</h4>
-        <ul class="space-y-3 text-gray-600">
-          <li>• Comfortable with embedded C, FreeRTOS, and ESP32</li>
-          <li>• REST APIs with FastAPI / Express</li>
-          <li>• MQTT and real-time systems</li>
-          <li>• Data visualization & dashboards</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- SKILLS -->
-  <section id="skills" class="py-16 bg-slate-100">
-    <div class="container mx-auto container-desktop px-6">
-      <h3 class="text-2xl font-bold mb-8 text-navy">Skills</h3>
-
-      <div class="grid grid-cols-3 gap-6 lg:grid-cols-6">
-        <div class="p-4 bg-white border border-navysoft rounded">Various Programming Language</div>
-        <div class="p-4 bg-white border border-navysoft rounded">3D Modelling</div>
-        <div class="p-4 bg-white border border-navysoft rounded">Electrical & Software Debuging</div>
-        <div class="p-4 bg-white border border-navysoft rounded">Web Development</div>
-        <div class="p-4 bg-white border border-navysoft rounded">Rapid Prototyping</div>
-        <div class="p-4 bg-white border border-navysoft rounded">ESP32 / Arduino</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PROJECTS -->
-  <section id="projects" class="py-16 bg-white">
-    <div class="container mx-auto container-desktop px-6">
-      <h3 class="text-2xl font-bold mb-8 text-navy">Selected Projects</h3>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <article class="bg-white border border-navysoft rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
-          <img src="https://via.placeholder.com/800x450" alt="Project 1" class="w-full h-44 object-cover">
-          <div class="p-4">
-            <h4 class="font-semibold mb-2">Project 1 — Company Website</h4>
-            <p class="text-sm text-gray-600 mb-3">Constantly Monitoring and Updating website</p>
-            <a href="https://venambak.id" class="text-sm text-navy hover:underline">View details →</a>
-          </div>
-        </article>
-
-        <article class="bg-white border border-navysoft rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
-          <img src="https://via.placeholder.com/800x450" alt="Project 2" class="w-full h-44 object-cover">
-          <div class="p-4">
-            <h4 class="font-semibold mb-2">Project 2 — Dashboard</h4>
-            <p class="text-sm text-gray-600 mb-3">Web dashboard to visualize sensor data with real-time updates.</p>
-            <a href="#" class="text-sm text-navy hover:underline">View details →</a>
-          </div>
-        </article>
-
-        <article class="bg-white border border-navysoft rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
-          <img src="https://via.placeholder.com/800x450" alt="Project 3" class="w-full h-44 object-cover">
-          <div class="p-4">
-            <h4 class="font-semibold mb-2">Project 3 — Automation</h4>
-            <p class="text-sm text-gray-600 mb-3">Embedded controller for servo-actuated mechanism with control loop.</p>
-            <a href="#" class="text-sm text-navy hover:underline">View details →</a>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact" class="py-16 bg-slate-100">
-    <div class="container mx-auto container-desktop px-6 max-w-2xl">
-      <h3 class="text-2xl font-bold mb-4 text-navy">Contact</h3>
-      <p class="text-gray-700 mb-6">Want to work together? Send a message and I'll get back to you.</p>
-
-      <form class="space-y-4 bg-white p-6 border border-navysoft rounded-lg">
-        <div class="grid grid-cols-2 gap-4">
-          <input id="name" type="text" placeholder="Your name" class="p-3 border rounded" />
-          <input id="email" type="email" placeholder="Your email" class="p-3 border rounded" />
-        </div>
-        <textarea id="message" rows="6" placeholder="Message" class="w-full p-3 border rounded"></textarea>
-        <div class="flex justify-end">
-          <button type="submit" class="px-6 py-3 bg-navy text-white rounded hover:bg-navysoft">Send message</button>
-        </div>
-      </form>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="bg-navy text-gray-300 border-t border-navysoft py-6">
-    <div class="container mx-auto container-desktop px-6 text-sm flex justify-between items-center">
-      <div>© 2025 Muhammad Alfath Gelardi</div>
-      <div class="space-x-4">
-        <a href="https://https://github.com/Alf4thG3lardi" class="hover:text-white">GitHub</a>
-        <a href="#" class="hover:text-white">LinkedIn</a>
-      </div>
-    </div>
-  </footer>
-
-    
-    <script>
-    document.getElementById('contact').addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const message = document.getElementById('message').value;
-
-    const to = "alfathgelardiofficial@email.com";
-
-    const subject = encodeURIComponent(`New message from ${name}`);
-    const body = encodeURIComponent(
-        `Name: ${name}\n` +
-        `Email: ${email}\n\n` +
-        `Message:\n${message}`
-    );
-
-    const mailtoURL = `mailto:${to}?subject=${subject}&body=${body}`;
-
-    window.location.href = mailtoURL;
-    });
-
-    const menuBtn = document.getElementById('menuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-
-
-    if (menuBtn && mobileMenu) {
-    menuBtn.addEventListener('click', () => {
-    mobileMenu.classList.toggle('hidden');
-    });
-
-
-    // Auto-close when link clicked
-    mobileMenu.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-    mobileMenu.classList.add('hidden');
-    });
-    });
+function toggle() {
+  if (watch != null) {
+    navigator.geolocation.clearWatch(watch); watch = null;
+    if (wl) { wl.release(); wl = null; }
+    save();
+  } else {
+    if (!navigator.geolocation) return msg('This browser has no geolocation support.');
+    navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+    },
+    (error) => {
+      console.error(`Error (${error.code}): ${error.message}`);
     }
-    </script>
+  );
+    msg(); fixed = false; if (!start) start = Date.now();
+    watch = navigator.geolocation.watchPosition(onPos, onErr, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+    lock();
+  }
+  setStatus();
+}
+function setStatus() {
+  const on = watch != null;
+  $('status').textContent = !on ? 'Idle' : fixed ? 'Recording' : 'Waiting for GPS…';
+  $('status').classList.toggle('on', on && fixed);
+  $('start').textContent = on ? 'Stop recording' : (pts.length ? 'Resume recording' : 'Start recording');
+  $('start').classList.toggle('on', on);
+}
+
+/* ---------- display ---------- */
+const f = () => U[unitI][1];
+const hms = s => [s / 3600, s / 60 % 60, s % 60].map(v => String(Math.floor(v)).padStart(2, '0')).join(':');
+function render() {
+  const last = pts[pts.length - 1], first = pts[0], k = f(), u = U[unitI][0];
+  const secs = last ? (last.t - first.t) / 1000 : 0;
+  $('spd').textContent = last ? (last.spd * k).toFixed(1) : '0.0';
+  $('unit').textContent = u; $('th-s').textContent = 'Speed (' + u + ')';
+  $('dist').textContent = (dist / 1000).toFixed(2) + ' km';
+  $('dur').textContent = hms(secs);
+  $('cnt').textContent = pts.length;
+  $('max').textContent = (max * k).toFixed(1) + ' ' + u;
+  $('avg').textContent = (secs > 0 ? dist / secs * k : 0).toFixed(1) + ' ' + u;
+  $('acc').textContent = last ? '±' + Math.round(last.acc) + ' m' : '–';
+  $('pos').textContent = last ? `${last.lat}, ${last.lon}` + (last.alt != null ? ` · ${Math.round(last.alt)} m alt` : '') +
+    (last.hd != null ? ` · ${Math.round(last.hd)}°` : '') : 'No position yet';
+  $('tbody').innerHTML = pts.slice(-6).reverse().map(p =>
+    `<tr><td>${new Date(p.t).toLocaleTimeString()}</td><td>${p.lat}</td><td>${p.lon}</td><td>${(p.spd * k).toFixed(1)}</td></tr>`).join('');
+  draw();
+}
+function draw() {
+  const cv = $('chart'), r = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = w * r; cv.height = h * r;
+  const g = cv.getContext('2d'); g.scale(r, r);
+  const s = pts.slice(-120).map(p => p.spd * f());
+  if (s.length < 2) return;
+  const m = Math.max(...s, 1) * 1.15;
+  g.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--acc');
+  g.lineWidth = 2; g.lineJoin = 'round'; g.beginPath();
+  s.forEach((v, i) => { const x = i / (s.length - 1) * w, y = h - 4 - v / m * (h - 8); i ? g.lineTo(x, y) : g.moveTo(x, y); });
+  g.stroke();
+}
+
+/* ---------- export ---------- */
+const esc = s => String(s).replace(/[<>&"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
+const iso = t => new Date(t).toISOString();
+function fname(ext) {
+  const d = new Date(start || Date.now()), z = n => String(n).padStart(2, '0');
+  return `gps-log-${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}.${ext}`;
+}
+function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function exportXML() {
+  if (!pts.length) return msg('Nothing recorded yet.');
+  const tag = (n, v) => v == null ? '' : `<${n}>${v}</${n}>`;
+  const body = pts.map((p, i) => `  <point index="${i + 1}">` + tag('time', iso(p.t)) + tag('latitude', p.lat) + tag('longitude', p.lon) +
+    tag('altitude_m', p.alt) + tag('accuracy_m', p.acc) + tag('speed_ms', p.spd) + tag('speed_kmh', rd(p.spd * 3.6, 3)) +
+    tag('heading_deg', p.hd) + tag('distance_m', p.dist) + '</point>').join('\n');
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<track started="${esc(iso(start || pts[0].t))}" points="${pts.length}" total_distance_m="${rd(dist, 1)}">\n${body}\n</track>\n`;
+  download(new Blob([xml], { type: 'application/xml' }), fname('xml'));
+}
+
+/* minimal .xlsx writer: ZIP (stored) + SpreadsheetML, no libraries */
+const CRC = (() => { const t = []; for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(b) { let c = -1; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ -1) >>> 0; }
+function zip(files) {
+  const enc = new TextEncoder(), parts = [], cen = []; let off = 0;
+  for (const f of files) {
+    const n = enc.encode(f.name), d = enc.encode(f.data), crc = crc32(d);
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(12, 33, true);
+    h.setUint32(14, crc, true); h.setUint32(18, d.length, true); h.setUint32(22, d.length, true); h.setUint16(26, n.length, true);
+    parts.push(new Uint8Array(h.buffer), n, d);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(14, 33, true);
+    c.setUint32(16, crc, true); c.setUint32(20, d.length, true); c.setUint32(24, d.length, true); c.setUint16(28, n.length, true);
+    c.setUint32(42, off, true);
+    cen.push(new Uint8Array(c.buffer), n);
+    off += 30 + n.length + d.length;
+  }
+  const cs = cen.reduce((s, a) => s + a.length, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true);
+  e.setUint32(12, cs, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...cen, new Uint8Array(e.buffer)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+function exportXLSX() {
+  if (!pts.length) return msg('Nothing recorded yet.');
+  const H = ['#', 'Time (UTC)', 'Latitude', 'Longitude', 'Altitude (m)', 'Accuracy (m)', 'Speed (m/s)', 'Speed (km/h)', 'Heading (deg)', 'Distance (m)'];
+  const L = 'ABCDEFGHIJ';
+  const cell = (i, r, v) => v == null ? '' : typeof v === 'number'
+    ? `<c r="${L[i]}${r}"><v>${v}</v></c>` : `<c r="${L[i]}${r}" t="inlineStr"><is><t>${esc(v)}</t></is></c>`;
+  const row = (r, vals) => `<row r="${r}">${vals.map((v, i) => cell(i, r, v)).join('')}</row>`;
+  const rows = [row(1, H)].concat(pts.map((p, i) =>
+    row(i + 2, [i + 1, iso(p.t), p.lat, p.lon, p.alt, p.acc, p.spd, rd(p.spd * 3.6, 3), p.hd, p.dist])));
+  const NS = 'http://schemas.openxmlformats.org/', R = NS + 'officeDocument/2006/relationships';
+  const hdr = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+  const blob = zip([
+    { name: '[Content_Types].xml', data: hdr + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>' },
+    { name: '_rels/.rels', data: hdr + `<Relationships xmlns="${NS}package/2006/relationships"><Relationship Id="rId1" Type="${R}/officeDocument" Target="xl/workbook.xml"/></Relationships>` },
+    { name: 'xl/workbook.xml', data: hdr + `<workbook xmlns="${NS}spreadsheetml/2006/main" xmlns:r="${R}"><sheets><sheet name="Track" sheetId="1" r:id="rId1"/></sheets></workbook>` },
+    { name: 'xl/_rels/workbook.xml.rels', data: hdr + `<Relationships xmlns="${NS}package/2006/relationships"><Relationship Id="rId1" Type="${R}/worksheet" Target="worksheets/sheet1.xml"/></Relationships>` },
+    { name: 'xl/worksheets/sheet1.xml', data: hdr + `<worksheet xmlns="${NS}spreadsheetml/2006/main"><cols><col min="1" max="10" width="17" customWidth="1"/></cols><sheetData>${rows.join('')}</sheetData></worksheet>` }
+  ]);
+  download(blob, fname('xlsx'));
+}
+
+/* ---------- wiring ---------- */
+$('start').onclick = toggle;
+$('unit').onclick = () => { unitI = (unitI + 1) % U.length; render(); };
+$('xml').onclick = exportXML;
+$('xlsx').onclick = exportXLSX;
+$('clear').onclick = () => {
+  if (!pts.length || !confirm('Delete all recorded points from this browser?')) return;
+  pts = []; start = null; dist = 0; max = 0;
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  msg(); setStatus(); render();
+};
+addEventListener('resize', draw);
+addEventListener('pagehide', save);
+if (!window.isSecureContext) msg('GPS only works over HTTPS or localhost. Host this file (for example on GitHub Pages) and open that link on your phone.');
+load(); setStatus(); render();
+</script>
 </body>
 </html>
-
